@@ -29,8 +29,15 @@
   (prop/for-all [s gen/string]
                 (is (not-any? clojure.string/blank? (map str (strip-whitespace s))))))
 
-(deftest setup-returns-defaults
+(deftest setup-creates-proper-guards
   "Setup returns default values"
+  (let [opts (setup {:salt "this is my salt"})]
+    (is (= "5N6y2rljDQak4xgzn8ZR1oKYLmJpEbVq3OBv9WwXPMe7" (opts :alphabet)))
+    (is (= "UHuhtcITCsFifS" (opts :seps)))
+    (is (= "AdG0" (opts :guards)))
+    (is (= 0 (opts :min-length)))))
+
+(deftest setup-returns-defaults
   (let [opts (setup)]
     (is (= "gjklmnopqrvwxyzABDEGJKLMNOPQRVWXYZ1234567890" (opts :alphabet)))
     (is (= DEFAULT_SEPS (opts :seps)))
@@ -66,7 +73,16 @@
   (is (= 440 (dehash "yy44" "xyz1234")))
   (is (= 1045 (dehash "1xzz" "xyz1234"))))
 
-(deftest test-encode-numbers-with-defaults
-  (let [{:keys [seps alphabet salt min-length guards]} (setup)]
-    (is (= "Y" (encode-numbers seps alphabet salt 0 [0])))))
-
+(deftest test-known-encodings
+  "Test known encodings of integers from other hashids libraries, for a given salt"
+  (let [known-encodings ['("this is my salt" [12345] "NkK9")
+                         '("this is my salt" [12346] "69PV")
+                         '("this was my salt" [12345] "dRn3")
+                         '("this was my salt" 12345 "dRn3")
+                         '("" [0] "gY")
+                         '("" [0 1 1000000] "pwcnfVMX3")
+                         '("this is my salt" [547 31 241271 311 31397 1129 71129] "3RoSDhelEyhxRsyWpCx5t1ZK")]
+        encode-test (fn [arglist] (let [[salt, nums, encoding] arglist]
+                                    (is (= encoding (encode {:salt salt} (flatten (list nums)))))))]
+    (testing "encoding"
+      (doall (map encode-test known-encodings)))))

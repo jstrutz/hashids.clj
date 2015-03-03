@@ -82,7 +82,7 @@
                  (if (< (+ idx 1) (count numbers))
                    [alph (str ret encchar addsep)]
                    [alph (str ret encchar)])))
-             [alphabet ""] ;; reduce by passing along alphabet, which is transformed in each iteration
+             [alphabet lottery] ;; reduce by passing along alphabet, which is transformed in each iteration
              (map-indexed vector numbers)))))
 
 (defn add-guards
@@ -169,7 +169,7 @@
         seps-unbal (->> (str-char-intersection alphabet seps)
                         distinct
                         strip-whitespace)
-        [seps alph] (balance-seps seps-unbal alph-unbal)]
+        [seps alph] (balance-seps (consistent-shuffle seps-unbal salt) alph-unbal)]
     (assoc (extract-guards (consistent-shuffle alph salt) seps)
       :min-length min-length
       :salt salt))))
