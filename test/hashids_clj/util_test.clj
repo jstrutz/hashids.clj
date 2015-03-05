@@ -4,7 +4,8 @@
             [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
-            [hashids-clj.util :refer :all]))
+            [hashids-clj.util :refer :all]
+            [clojure.set]))
 
 (deftest split-on-chars-test
   (is (= '( (\p \w) (\n) (\V \M \X \3)) (split-on-chars "pwcnfVMX3" "cfhistuCFHISTU"))))
