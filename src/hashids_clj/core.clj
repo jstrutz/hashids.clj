@@ -9,5 +9,6 @@
 )
 
 (defn decode
-  [str])
+  [salt encstr]
+  (impl/decode {:salt salt} encstr))
 

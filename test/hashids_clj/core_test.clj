@@ -16,6 +16,9 @@
                          '("" [0 1 1000000] "pwcnfVMX3")
                          '("this is my salt" [547 31 241271 311 31397 1129 71129] "3RoSDhelEyhxRsyWpCx5t1ZK")]
         encode-test (fn [arglist] (let [[salt, nums, encoding] arglist]
-                                    (is (= encoding (encode salt nums)))))]
+                                    (is (= encoding (encode salt nums)))))
+        decode-test (fn [arglist] (let [[salt, nums, encoding] arglist]
+                                    (is (= (flatten (list nums)) (decode salt encoding)))))]
     (testing "encoding"
-      (doall (map encode-test known-encodings)))))
+      (doall (map encode-test known-encodings))
+      (doall (map decode-test known-encodings)))))

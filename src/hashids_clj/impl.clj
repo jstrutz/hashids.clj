@@ -184,3 +184,42 @@
        (add-guards min-length guards hash_int)
        (ensure-min-length min-length alphabet))))
 
+(defmacro xor
+  ([] nil)
+  ([a] a)
+  ([a b]
+    `(let [a# ~a
+           b# ~b]
+      (if a#
+        (if b# false a#)
+        (if b# b# false)))))
+
+(defn split-on-chars
+  [instr splitstr]
+  (map #(map second %)
+       (partition-by first
+                     (second (reduce
+                              (fn [[prev-chg letters] letter]
+                                (let [is-sep (boolean (some #{letter} splitstr))
+                                      this-chg (xor prev-chg is-sep)]
+                                  [this-chg (if is-sep
+                                              letters
+                                              (conj letters [this-chg letter]))]))
+                              [false []]
+                              instr)))))
+
+(defn decode
+  [opts encstr]
+  (let [{:keys [seps alphabet salt min-length guards]} (setup opts)
+        breakdown (split-on-chars encstr guards)
+        breakdown-idx (if (some #{(count breakdown)} '(2 3)) 1 0)
+        bdn (nth breakdown breakdown-idx)
+        lottery (first bdn)
+        arr (split-on-chars (drop 1 bdn) seps)]
+    (seq (second (reduce (fn [[prev-alph ret] sub-hash]
+              (let [buf (str lottery salt prev-alph)
+                    alph (consistent-shuffle prev-alph (subs buf 0 (count prev-alph)))]
+                [alph (conj ret (dehash sub-hash alph))]))
+            [alphabet []]
+            arr)))))
+
