@@ -23,22 +23,6 @@
                  salt (gen/not-empty gen-salt)]
                 (not= alphabet (consistent-shuffle alphabet salt))))
 
-(defspec strip-whitespace-never-returns-whitespace
-  ;;"consistent-shuffle returns something other than the alphabet for a non-empty string"
-  1000
-  (prop/for-all [s gen/string]
-                (is (not-any? clojure.string/blank? (map str (strip-whitespace s))))))
-
-(defspec split-on-chars-never-returns-splitchars
-  1000
-  (prop/for-all [instr gen/string
-                 splitstr gen/string]
-                (is (every? (fn [s]
-                              (empty? (clojure.set/intersection (set s) (set splitstr))))
-                            (split-on-chars instr splitstr)))))
-
-
-
 (deftest setup-creates-proper-guards
   "Setup returns default values"
   (let [opts (setup {:salt "this is my salt"})]
@@ -82,9 +66,6 @@
   (is (= 218 (dehash "x21y" "xyz1234")))
   (is (= 440 (dehash "yy44" "xyz1234")))
   (is (= 1045 (dehash "1xzz" "xyz1234"))))
-
-(deftest split-on-chars-test
-  (is (= '( (\p \w) (\n) (\V \M \X \3)) (split-on-chars "pwcnfVMX3" "cfhistuCFHISTU"))))
 
 (deftest test-known-encodings
   "Test known encodings of integers from other hashids libraries, for a given salt"

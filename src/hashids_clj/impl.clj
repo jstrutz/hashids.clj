@@ -1,6 +1,5 @@
 (ns hashids-clj.impl
-  (:use flatland.ordered.set)
-  (:require [clojure.math.numeric-tower :as math]))
+  (:require [hashids-clj.util :refer :all]))
 
 (def DEFAULT_ALPHABET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
 (def DEFAULT_SEPS "cfhistuCFHISTU")
@@ -11,24 +10,6 @@
 
 (def SEP_DIV (/ 7 2))
 (def GUARD_DIV 12)
-
-(defn swap [v i1 i2]
-  (assoc v i2 (v i1) i1 (v i2)))
-
-(defn str->charint
-  "Return the integer which represents the first character in the string"
-  [instr]
-  (-> instr
-      char-array
-      first
-      int))
-
-(defn positions
-  [pred coll]
-  (keep-indexed (fn [idx x]
-                  (when (pred x)
-                    idx))
-                coll))
 
 (defn consistent-shuffle
   [alphabet salt]
@@ -44,7 +25,6 @@
                              [(swap alph i (mod (+ n v p) i)) p])))
                        [(vec alphabet) 0]
                        (map-indexed (fn [idx a] [idx a]) alphabet)))))
-
 
 (defn enhash
   ;; Known as 'hash' in other implementations
@@ -65,8 +45,8 @@
   (reduce + (map-indexed
              (fn [idx c]
                (let [pos (first (positions #{c} alphabet))]
-                 (* pos (math/expt (count alphabet)
-                              (- (count input) idx 1)))))
+                 (* pos (int (expt (count alphabet)
+                                   (- (count input) idx 1))))))
              (vec input))))
 
 (defn encode-numbers
@@ -114,25 +94,11 @@
     (second (first (drop-while #(< (count (second %)) min-length)
                                (iterate upsize [alphabet hashstr]))))))
 
-(defn strip-whitespace [s]
-  (apply str (remove clojure.string/blank? (map str s))))
-
-(defn str-char-intersection
-  [a b]
-  (let [osa (into (ordered-set) a)
-        osb (into (ordered-set) b)]
-    (apply str (clojure.set/intersection osa osb))))
-
-(defn str-char-difference
-  [a b]
-  (let [osa (into (ordered-set) a)
-        osb (into (ordered-set) b)]
-    (apply str (clojure.set/difference osa osb))))
 
 (defn balance-seps
   "Balance alphabet and seps, the ratio of sizes of which should SEP_DIV"
   [seps alph]
-  (let [seps-length (max 2 (math/ceil (/ (count alph) SEP_DIV)))
+  (let [seps-length (max 2 (ceil (/ (count alph) SEP_DIV)))
         seps-diff (- seps-length (count seps))]
     (if (or (zero? (count seps))
             (> (/ (count alph)
@@ -146,7 +112,7 @@
 (defn extract-guards
   "Take portions of seps or alphabet to make guards"
   [alph seps]
-  (let [guard-length (math/ceil (/ (count alph) GUARD_DIV))]
+  (let [guard-length (ceil (/ (count alph) GUARD_DIV))]
     (if (< (count alph) 3)
       {:guards (subs seps 0 guard-length)
        :seps (subs seps guard-length)
@@ -163,10 +129,10 @@
          salt       DEFAULT_SALT
          min-length DEFAULT_MIN_LENGTH}}]
     {:pre  [(>= (count alphabet) MIN_ALPHABET_LENGTH)]}
-  (let [alph-unbal (->> (str-char-difference alphabet seps)
+  (let [alph-unbal (->> (chars-difference alphabet seps)
                         distinct
                         strip-whitespace)
-        seps-unbal (->> (str-char-intersection alphabet seps)
+        seps-unbal (->> (chars-intersection alphabet seps)
                         distinct
                         strip-whitespace)
         [seps alph] (balance-seps (consistent-shuffle seps-unbal salt) alph-unbal)]
@@ -183,30 +149,6 @@
        (encode-numbers seps alphabet salt hash_int)
        (add-guards min-length guards hash_int)
        (ensure-min-length min-length alphabet))))
-
-(defmacro xor
-  ([] nil)
-  ([a] a)
-  ([a b]
-    `(let [a# ~a
-           b# ~b]
-      (if a#
-        (if b# false a#)
-        (if b# b# false)))))
-
-(defn split-on-chars
-  [instr splitstr]
-  (map #(map second %)
-       (partition-by first
-                     (second (reduce
-                              (fn [[prev-chg letters] letter]
-                                (let [is-sep (boolean (some #{letter} splitstr))
-                                      this-chg (xor prev-chg is-sep)]
-                                  [this-chg (if is-sep
-                                              letters
-                                              (conj letters [this-chg letter]))]))
-                              [false []]
-                              instr)))))
 
 (defn decode
   [opts encstr]
