@@ -1,10 +1,10 @@
-(ns hashids-clj.impl-test
+(ns hashids.impl-test
   (:require [clojure.test :refer :all]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
-            [hashids-clj.impl :refer :all]))
+            [hashids.impl :refer :all]))
 
 ;;(def gen-alphabet (gen/such-that distinct? (gen/not-empty (gen/vector gen/char-alphanumeric 0 256))))
 (def gen-alphabet (gen/return "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"))

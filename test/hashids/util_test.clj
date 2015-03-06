@@ -1,10 +1,10 @@
-(ns hashids-clj.util-test
+(ns hashids.util-test
   (:require [clojure.test :refer :all]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
-            [hashids-clj.util :refer :all]
+            [hashids.util :refer :all]
             [clojure.set]))
 
 (deftest split-on-chars-test

@@ -1,5 +1,5 @@
-(ns hashids-clj.impl
-  (:require [hashids-clj.util :refer :all]))
+(ns hashids.impl
+  (:require [hashids.util :refer :all]))
 
 (def DEFAULT_ALPHABET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
 (def DEFAULT_SEPS "cfhistuCFHISTU")

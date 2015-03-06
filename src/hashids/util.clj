@@ -1,4 +1,4 @@
-(ns hashids-clj.util)
+(ns hashids.util)
 
 (defmacro xor
   ([] nil)

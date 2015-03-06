@@ -1,4 +1,4 @@
-# hashids-clj
+# hashids.clj
 
 A Clojure library designed to ... well, that part is up to you.
 
@@ -8,7 +8,7 @@ FIXME
 
 ## License
 
-Copyright © 2015 FIXME
+Copyright © 2015 Jason Strutz
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
