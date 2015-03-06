@@ -97,3 +97,11 @@
       (doall (map encode-test known-encodings)))
     (testing "decode"
       (doall (map decode-test known-encodings)))))
+
+(defspec failed-decodings-return-empty-collection
+  ;;"encode a bunch of numbers, and make sure that they return an empty collection when you attempt to decrypt with a different salt"
+  200
+  (prop/for-all [good-salt (gen/not-empty gen-salt)
+                 bad-salt (gen/not-empty gen-salt)
+                 nums (gen/not-empty (gen/vector gen/pos-int))]
+                (= '() (decode {:salt bad-salt} (encode {:salt good-salt} nums)))))
