@@ -3,11 +3,13 @@
 
 
 (defn encode
-  ([opts nums]
+  [opts nums]
+  {:pre [(not-empty (flatten (list nums)))
+         (every? integer? (flatten (list nums)))
+         (not-any? neg? (flatten (list nums)))]}
    (impl/encode opts (flatten (list nums))))
-  ;; TODO Add precondition to ensure all nums are integers
-)
 
 (defn decode
-  ([opts encstr]
-  (impl/decode opts encstr)))
+  [opts encstr]
+  {:pre [(seq encstr)]}
+  (impl/decode opts encstr))
