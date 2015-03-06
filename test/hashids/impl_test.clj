@@ -6,7 +6,6 @@
             [clojure.test.check.properties :as prop]
             [hashids.impl :refer :all]))
 
-;;(def gen-alphabet (gen/such-that distinct? (gen/not-empty (gen/vector gen/char-alphanumeric 0 256))))
 (def gen-alphabet (gen/return "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"))
 (def gen-salt gen/string-alphanumeric)
 
