@@ -3,8 +3,8 @@
 
 
 (defn encode
-  [opts nums]
-  {:pre [(not-empty (flatten (list nums)))
+  [opts & nums]
+  {:pre [(not-empty nums)
          (every? integer? (flatten (list nums)))
          (not-any? neg? (flatten (list nums)))]}
    (impl/encode opts (flatten (list nums))))

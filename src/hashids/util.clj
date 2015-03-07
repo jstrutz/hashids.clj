@@ -10,6 +10,9 @@
         (if b# false a#)
         (if b# b# false)))))
 
+(defn int->hexstr [n] (format "%x" n))
+(defn hexstr->int [s] (Integer/parseInt s 16))
+
 (defn ceil
   [v]
   (int (java.lang.Math/ceil v)))

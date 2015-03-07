@@ -50,49 +50,60 @@
              (vec input))))
 
 (defn encode-numbers
-  [seps alphabet salt hash_int numbers]
-  (let [lottery  (str (nth alphabet (mod hash_int (count alphabet))))
-        sepsc    (cycle seps)]
-    (second
-     (reduce (fn [[alph ret] [idx n]]
-               (let [buf     (concat lottery salt alph)
-                     alph    (consistent-shuffle (vec alph) (take (count alph) buf))
-                     encchar (enhash n alph)
-                     addsep  (nth sepsc (mod n (+ (int (first encchar)) idx)))]
-                 (if (< (+ idx 1) (count numbers))
-                   [alph (str ret encchar addsep)]
-                   [alph (str ret encchar)])))
-             [alphabet lottery] ;; reduce by passing along alphabet, which is transformed in each iteration
-             (map-indexed vector numbers)))))
+  [{:keys [seps alphabet salt hash-int numbers], :as args}]
+  (let [lottery  (str (nth alphabet (mod hash-int (count alphabet))))
+        sepsc    (cycle seps)
+        enc-result (reduce (fn [[alph ret] [idx n]]
+                             (let [buf     (concat lottery salt alph)
+                                   alph    (consistent-shuffle (vec alph) (take (count alph) buf))
+                                   encchar (enhash n alph)
+                                   addsep  (nth sepsc (mod n (+ (int (first encchar)) idx)))]
+                               (if (< (+ idx 1) (count numbers))
+                                 [alph (str ret encchar addsep)]
+                                 [alph (str ret encchar)])))
+                           [alphabet lottery] ;; reduce by passing along alphabet, which is transformed in each iteration
+                           (map-indexed vector numbers))]
+    (assoc args
+      :alphabet (first enc-result)
+      :hash-str (second enc-result))))
+
 
 (defn add-guards
-  [min-length guards hash_int hashstr]
+  [{:keys [min-length guards hash-int hash-str] :as all-args}]
+
   (let [prepend-guard #(if (< (count %) min-length)
                          (str (nth (cycle guards)
-                                   (+ hash_int (int (nth % 0))))
+                                   (+ hash-int (int (nth % 0))))
                               %)
                          %)
         append-guard #(if (< (count %) min-length)
                         (str %
                              (nth (cycle guards)
-                                  (+ hash_int (int (nth % 2)))))
+                                  (+ hash-int (int (nth % 2)))))
                         %)]
-    (->> hashstr
-         prepend-guard
-         append-guard)))
+    (assoc all-args :hash-str (->> hash-str
+                                   prepend-guard
+                                   append-guard))))
 
 (defn ensure-min-length
-  [min-length alphabet hashstr]
-  (let [half_length (int (/ (count alphabet) 2))
+  [{:keys [min-length alphabet hash-str] :as all-args}]
+
+  (let [half-length (int (/ (count alphabet) 2))
         upsize (fn [[alph ret]]
                  (let [alph (consistent-shuffle alph alph)
-                       rplusalph (str (subs alph half_length) ret (subs alph 0 half_length))
-                       excess (- (count rplusalph) min-length)]
-                   (if (> excess 0)
-                     [alph (subs rplusalph (int (/ excess 2)) min-length)]
-                     [alph rplusalph])))]
-    (second (first (drop-while #(< (count (second %)) min-length)
-                               (iterate upsize [alphabet hashstr]))))))
+                       rplusalph (str (subs alph half-length) ret (subs alph 0 half-length))
+                       excess (- (count rplusalph) min-length)
+                       ret-start (int (/ excess 2))
+                       ret-end (+ ret-start min-length)]
+                   (if (pos? excess)
+                     [alph (subs rplusalph ret-start ret-end)]
+                     [alph rplusalph])))
+        result (first (drop-while #(< (count (second %)) min-length)
+                                  (iterate upsize [alphabet hash-str])))]
+    (assoc all-args
+      :alphabet (first result)
+      :hash-str (second result))))
+
 
 
 (defn balance-seps
@@ -142,13 +153,14 @@
 
 (defn encode
   [opts numbers]
-  (let [{:keys [seps alphabet salt min-length guards]} (setup opts)
-        hash_int (reduce + (map-indexed (fn [idx num] (mod num (+ idx 100))) numbers))]
+  (let [settings (setup opts)
+        hash-int (reduce + (map-indexed (fn [idx num] (mod num (+ idx 100))) numbers))]
 
-  (->> numbers
-       (encode-numbers seps alphabet salt hash_int)
-       (add-guards min-length guards hash_int)
-       (ensure-min-length min-length alphabet))))
+  (:hash-str
+   (->> (assoc settings :hash-int hash-int :numbers numbers)
+        encode-numbers
+        add-guards
+        ensure-min-length))))
 
 (defn decode
   [opts encstr]

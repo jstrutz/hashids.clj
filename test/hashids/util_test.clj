@@ -7,6 +7,12 @@
             [hashids.util :refer :all]
             [clojure.set]))
 
+(deftest test-int->hexstr
+  (is (= "2a" (int->hexstr 42))))
+
+(deftest test-hexstr->int
+  (is (= 42 (hexstr->int "2a"))))
+
 (deftest split-on-chars-test
   (is (= '( (\p \w) (\n) (\V \M \X \3)) (split-on-chars "pwcnfVMX3" "cfhistuCFHISTU"))))
 

@@ -13,14 +13,14 @@
   ;;"consistent-shuffle returns the alphabet if given an empty salt"
   1000
   (prop/for-all [alphabet gen-alphabet]
-                (= alphabet (consistent-shuffle alphabet ""))))
+                (is (= alphabet (consistent-shuffle alphabet "")))))
 
 (defspec consistent-shuffle-non-empty
   ;;"consistent-shuffle returns something other than the alphabet for a non-empty salt"
   1000
   (prop/for-all [alphabet gen-alphabet
                  salt (gen/not-empty gen-salt)]
-                (not= alphabet (consistent-shuffle alphabet salt))))
+                (is (not= alphabet (consistent-shuffle alphabet salt)))))
 
 (deftest setup-creates-proper-guards
   "Setup returns default values"
@@ -76,20 +76,6 @@
                          '("" [0 1 1000000] "pwcnfVMX3")
                          '("this is my salt" [547 31 241271 311 31397 1129 71129] "3RoSDhelEyhxRsyWpCx5t1ZK")]
         encode-test (fn [arglist] (let [[salt, nums, encoding] arglist]
-                                    (is (= encoding (encode {:salt salt} (flatten (list nums)))))))]
-    (testing "encoding"
-      (doall (map encode-test known-encodings)))))
-
-(deftest test-known-encodings
-  "Test known encodings of integers from other hashids libraries, for a given salt"
-  (let [known-encodings ['("this is my salt" [12345] "NkK9")
-                         '("this is my salt" [12346] "69PV")
-                         '("this was my salt" [12345] "dRn3")
-                         '("this was my salt" 12345 "dRn3")
-                         '("" [0] "gY")
-                         '("" [0 1 1000000] "pwcnfVMX3")
-                         '("this is my salt" [547 31 241271 311 31397 1129 71129] "3RoSDhelEyhxRsyWpCx5t1ZK")]
-        encode-test (fn [arglist] (let [[salt, nums, encoding] arglist]
                                     (is (= encoding (encode {:salt salt} (flatten (list nums)))))))
         decode-test (fn [arglist] (let [[salt, nums, encoding] arglist]
                                     (is (= (flatten (list nums)) (decode {:salt salt} encoding)))))]
@@ -98,10 +84,16 @@
     (testing "decode"
       (doall (map decode-test known-encodings)))))
 
-(defspec failed-decodings-return-empty-collection
-  ;;"encode a bunch of numbers, and make sure that they return an empty collection when you attempt to decrypt with a different salt"
-  200
-  (prop/for-all [good-salt (gen/not-empty gen-salt)
-                 bad-salt (gen/not-empty gen-salt)
-                 nums (gen/not-empty (gen/vector gen/pos-int))]
-                (= '() (decode {:salt bad-salt} (encode {:salt good-salt} nums)))))
+(deftest test-min-length-known-values
+  "Test known encodings of integers from other hashids libraries, for a given salt"
+  (is (= "B0NkK9A5" (encode {:salt "this is my salt" :min-length 8} '(12345)))))
+
+(deftest failed-decodings-return-empty-collection
+  "encode a set of numbers, and ensure that they return an empty collection when decrypted with a different salt"
+  (is (= '() (decode {:salt "xyzzy"} (encode {:salt "abcde"} [0 1 2]))))
+  (is (= '() (decode {:salt "xyzzy"} (encode {:salt "z"} [9000])))))
+
+(deftest ensure-min-length-sanity-check
+  (is (= "B0NkK9A5" ((ensure-min-length {:min-length 8
+                                         :alphabet "4VNWO5kPrnZ1Y3LgKoBmXyzwb9aMj7l2RDQ6EJexqv8p"
+                                         :hash-str "0NkK9A"}) :hash-str))))
