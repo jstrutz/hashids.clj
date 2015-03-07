@@ -45,6 +45,9 @@
                      (some #{c} str2)))
         (distinct (str str1 str2))))
 
+(defn chars-subtraction [str1 str2]
+  (remove #(some #{%} str2) str1))
+
 
 (defn split-on-chars
   [instr splitstr]

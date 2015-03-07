@@ -97,3 +97,9 @@
   (is (= "B0NkK9A5" ((ensure-min-length {:min-length 8
                                          :alphabet "4VNWO5kPrnZ1Y3LgKoBmXyzwb9aMj7l2RDQ6EJexqv8p"
                                          :hash-str "0NkK9A"}) :hash-str))))
+
+(deftest decoding-a-string-an-alphabet-mismatch-returns-empty-list
+  (is (= '() (decode {:alphabet "aeiou09123456789"} "aBMswoO2UB3Sj"))))
+
+(deftest different-alphabet
+  (is (= "02949" (encode {:alphabet "aeiouy0123456789"} '(12345)))))

@@ -30,24 +30,25 @@
   ;; Known as 'hash' in other implementations
   ([input alphabet] (enhash input alphabet (num input) ""))
   ([input alphabet n res]
-   (if (zero? input)
-     (subs alphabet 0 1)
-     (if (zero? n)
-       res
-       (recur input
-              alphabet
-              (int (/ n (count alphabet)))
-              (str (nth (cycle alphabet) n) res))))))
+   (cond
+    (zero? input) (subs alphabet 0 1)
+    (zero? n) res
+    :else (recur input
+                 alphabet
+                 (int (/ n (count alphabet)))
+                 (str (nth (cycle alphabet) n) res)))))
 
 (defn dehash
   ;; Known as 'unhash' in other implementations
   [input alphabet]
-  (reduce + (map-indexed
-             (fn [idx c]
-               (let [pos (first (positions #{c} alphabet))]
-                 (* pos (int (expt (count alphabet)
-                                   (- (count input) idx 1))))))
-             (vec input))))
+  (reduce +
+          (remove nil?
+                  (map-indexed
+                   (fn [idx c]
+                     (if-let [pos (first (positions #{c} alphabet))]
+                       (* pos (int (expt (count alphabet)
+                                         (- (count input) idx 1))))))
+                   (vec input)))))
 
 (defn encode-numbers
   [{:keys [seps alphabet salt hash-int numbers], :as args}]
@@ -109,14 +110,19 @@
 (defn balance-seps
   "Balance alphabet and seps, the ratio of sizes of which should SEP_DIV"
   [seps alph]
-  (let [seps-length (max 2 (ceil (/ (count alph) SEP_DIV)))
-        seps-diff (- seps-length (count seps))]
+  (let [seps-length-ceil (ceil (/ (count alph) SEP_DIV))
+        seps-length (if (= 1 seps-length-ceil)
+                      2
+                      seps-length-ceil)
+        seps-diff (- seps-length (count seps))
+        split-alph (map clojure.string/join (split-at seps-diff alph))]
+
     (if (or (zero? (count seps))
             (> (/ (count alph)
                   (count seps))
                SEP_DIV))
-      (if (> seps-length (count seps))
-        (vec (map clojure.string/join (split-at 2 (str seps alph))))
+      (if (pos? seps-diff)
+        [(str seps (first split-alph)) (last split-alph)]
         [(subs seps 0 seps-length) alph])
       [seps alph])))
 
@@ -132,6 +138,7 @@
        :seps seps
        :alphabet (subs alph guard-length)})))
 
+
 (defn setup
   ([] (setup {}))
   ([{:keys [seps alphabet salt min-length]
@@ -140,30 +147,36 @@
          salt       DEFAULT_SALT
          min-length DEFAULT_MIN_LENGTH}}]
     {:pre  [(>= (count alphabet) MIN_ALPHABET_LENGTH)]}
-  (let [alph-unbal (->> (chars-difference alphabet seps)
+  (let [alph-unbal (->> (chars-subtraction alphabet seps) ;; Alphabet should not contains seps
                         distinct
                         strip-whitespace)
-        seps-unbal (->> (chars-intersection alphabet seps)
+        seps-unbal (->> (chars-intersection alphabet seps) ;; Seps should only contain characters present in alphabet
                         distinct
                         strip-whitespace)
-        [seps alph] (balance-seps (consistent-shuffle seps-unbal salt) alph-unbal)]
-    (assoc (extract-guards (consistent-shuffle alph salt) seps)
+        [seps-bal alph-bal] (balance-seps (consistent-shuffle seps-unbal salt) alph-unbal)]
+    (assoc (extract-guards (consistent-shuffle alph-bal salt) seps-bal)
       :min-length min-length
       :salt salt))))
 
-(defn encode
+(defn encode-intern
   [opts numbers]
+  {:pre [(coll? numbers)]}
   (let [settings (setup opts)
         hash-int (reduce + (map-indexed (fn [idx num] (mod num (+ idx 100))) numbers))]
+     (->> (assoc settings :hash-int hash-int :numbers numbers)
+          encode-numbers
+          add-guards
+          ensure-min-length)))
 
-  (:hash-str
-   (->> (assoc settings :hash-int hash-int :numbers numbers)
-        encode-numbers
-        add-guards
-        ensure-min-length))))
+(defn encode
+  [opts numbers]
+  {:pre [(coll? numbers)]}
+  (:hash-str (encode-intern opts numbers)))
+
 
 (defn decode
   [opts encstr]
+  {:pre [(string? encstr)]}
   (let [{:keys [seps alphabet salt min-length guards]} (setup opts)
         breakdown (split-on-chars encstr guards)
         breakdown-idx (if (some #{(count breakdown)} '(2 3)) 1 0)
@@ -180,7 +193,3 @@
            (encode opts decoded-result))
       decoded-result
       '())))
-
-
-
-
