@@ -18,7 +18,7 @@
     (apply str (reduce (fn [[alph p] [idx a]]
                          (let [i (- (count alph) idx 1)
                                v (mod idx (count salt))
-                               n (int (nth salt v))
+                               n (long (nth salt v))
                                p (+ p n)]
                            (if (zero? i)
                              alph
@@ -35,8 +35,8 @@
     (zero? n) res
     :else (recur input
                  alphabet
-                 (int (/ n (count alphabet)))
-                 (str (nth (cycle alphabet) n) res)))))
+                 (long (/ n (count alphabet)))
+                 (str (nth alphabet (mod n (count alphabet)) ) res)))))
 
 (defn dehash
   ;; Known as 'unhash' in other implementations
@@ -46,7 +46,7 @@
                   (map-indexed
                    (fn [idx c]
                      (if-let [pos (first (positions #{c} alphabet))]
-                       (* pos (int (expt (count alphabet)
+                       (* pos (long (expt (count alphabet)
                                          (- (count input) idx 1))))))
                    (vec input)))))
 
@@ -58,7 +58,7 @@
                              (let [buf     (concat lottery salt alph)
                                    alph    (consistent-shuffle (vec alph) (take (count alph) buf))
                                    encchar (enhash n alph)
-                                   addsep  (nth sepsc (mod n (+ (int (first encchar)) idx)))]
+                                   addsep  (nth sepsc (mod n (+ (long (first encchar)) idx)))]
                                (if (< (+ idx 1) (count numbers))
                                  [alph (str ret encchar addsep)]
                                  [alph (str ret encchar)])))
@@ -74,13 +74,13 @@
 
   (let [prepend-guard #(if (< (count %) min-length)
                          (str (nth (cycle guards)
-                                   (+ hash-int (int (nth % 0))))
+                                   (+ hash-int (long (nth % 0))))
                               %)
                          %)
         append-guard #(if (< (count %) min-length)
                         (str %
                              (nth (cycle guards)
-                                  (+ hash-int (int (nth % 2)))))
+                                  (+ hash-int (long (nth % 2)))))
                         %)]
     (assoc all-args :hash-str (->> hash-str
                                    prepend-guard
@@ -89,12 +89,12 @@
 (defn ensure-min-length
   [{:keys [min-length alphabet hash-str] :as all-args}]
 
-  (let [half-length (int (/ (count alphabet) 2))
+  (let [half-length (long (/ (count alphabet) 2))
         upsize (fn [[alph ret]]
                  (let [alph (consistent-shuffle alph alph)
                        rplusalph (str (subs alph half-length) ret (subs alph 0 half-length))
                        excess (- (count rplusalph) min-length)
-                       ret-start (int (/ excess 2))
+                       ret-start (long (/ excess 2))
                        ret-end (+ ret-start min-length)]
                    (if (pos? excess)
                      [alph (subs rplusalph ret-start ret-end)]

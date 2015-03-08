@@ -10,16 +10,22 @@
         (if b# false a#)
         (if b# b# false)))))
 
-(defn int->hexstr [n] (format "%x" n))
-(defn hexstr->int [s] (Integer/parseInt s 16))
-
-(defn ceil
-  [v]
-  (int (java.lang.Math/ceil v)))
-
 (defn expt
   [b e]
   (java.lang.Math/pow b e))
+
+(defn long->hexstr [n] (format "%x" n))
+(defn hexstr->long
+  [s]
+  (try
+    (reduce + (map-indexed (fn [idx c]
+               (* (int (expt 16 idx)) (Integer/parseInt (str c) 16))) (reverse s)))
+  (catch java.lang.NumberFormatException e nil)))
+
+(defn ceil
+  [v]
+  (long (java.lang.Math/ceil v)))
+
 
 (defn positions
   "Returns the indexes of the items in the collection whose items satisfy the predicate"

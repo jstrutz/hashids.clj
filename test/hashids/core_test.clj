@@ -50,3 +50,9 @@
 (deftest test-min-length-known-values
   "Test known encodings of integers from other hashids libraries, for a given salt"
   (is (= "B0NkK9A5" (encode {:salt "this is my salt" :min-length 8} 12345))))
+
+(deftest test-encode-hex
+  (is (= "kRNrpKlJ" (encode-hex {:salt "this is my salt"} "deadbeef"))))
+
+(deftest test-decode-hex
+  (is (= '("DEADBEEF") (decode-hex {:salt "this is my salt"} "kRNrpKlJ"))))

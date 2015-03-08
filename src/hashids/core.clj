@@ -1,5 +1,6 @@
 (ns hashids.core
-  (:require [hashids.impl :as impl]))
+  (:require [hashids.impl :as impl])
+  (:require [hashids.util :as util]))
 
 
 (defn encode
@@ -13,3 +14,14 @@
   [opts encstr]
   {:pre [(seq encstr)]}
   (impl/decode opts encstr))
+
+(defn encode-hex
+  [opts & hexstrs]
+  {:pre [(not-empty hexstrs)
+         (every? string? (flatten (list hexstrs)))]}
+  (encode opts (map util/hexstr->long (flatten (list hexstrs)))))
+
+(defn decode-hex
+  [opts encstr]
+  {:pre [(seq encstr)]}
+  (map util/long->hexstr (decode opts encstr)))

@@ -13,6 +13,10 @@
 (deftest test-hexstr->int
   (is (= 42 (hexstr->int "2a"))))
 
+(deftest test-hexstr->int-bad-input
+  (is (= nil (hexstr->int "XYZ"))))
+
+
 (deftest split-on-chars-test
   (is (= '( (\p \w) (\n) (\V \M \X \3)) (split-on-chars "pwcnfVMX3" "cfhistuCFHISTU"))))
 
