@@ -1,6 +1,8 @@
 # hashids.clj
 
-A Clojure library to generate short unique ids from integers
+A Clojure library to generate short unique ids from integers.
+
+This is port of the [hashids](http://hashids.org) library, and aims to be functionally identical.
 
 ## Usage
 
@@ -94,8 +96,6 @@ This code was written with the intent of placing created ids in visible places -
 Therefore, the algorithm tries to avoid generating most common English curse words. This is done by never placing the following letters next to each other:
 
 	c, C, s, S, f, F, h, H, u, U, i, I, t, T
-
-
 
 
 ## License
