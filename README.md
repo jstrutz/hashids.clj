@@ -100,7 +100,7 @@ Therefore, the algorithm tries to avoid generating most common English curse wor
 
 ## License
 
-Copyright © 2015 Jason Strutz
+Copyright © 2015 [Jason Strutz](http://jasonstrutz.com)
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
