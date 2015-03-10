@@ -55,4 +55,4 @@
   (is (= "kRNrpKlJ" (encode-hex {:salt "this is my salt"} "deadbeef"))))
 
 (deftest test-decode-hex
-  (is (= '("DEADBEEF") (decode-hex {:salt "this is my salt"} "kRNrpKlJ"))))
+  (is (= '("deadbeef") (decode-hex {:salt "this is my salt"} "kRNrpKlJ"))))

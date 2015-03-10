@@ -7,14 +7,16 @@
             [hashids.util :refer :all]
             [clojure.set]))
 
-(deftest test-int->hexstr
-  (is (= "2a" (int->hexstr 42))))
+(deftest test-long->hexstr
+  (is (= "2a" (long->hexstr 42)))
+  (is (= "deadbeef" (long->hexstr 3735928559))))
 
-(deftest test-hexstr->int
-  (is (= 42 (hexstr->int "2a"))))
+(deftest test-hexstr->long
+  (is (= 42 (hexstr->long "2a")))
+  (is (= 3735928559 (hexstr->long "deadbeef"))))
 
-(deftest test-hexstr->int-bad-input
-  (is (= nil (hexstr->int "XYZ"))))
+(deftest test-hexstr->long-bad-input
+  (is (= nil (hexstr->long "XYZ"))))
 
 
 (deftest split-on-chars-test

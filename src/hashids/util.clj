@@ -1,4 +1,5 @@
-(ns hashids.util)
+(ns hashids.util
+  (require [clojure.edn :as edn]))
 
 (defmacro xor
   ([] nil)
@@ -18,8 +19,7 @@
 (defn hexstr->long
   [s]
   (try
-    (reduce + (map-indexed (fn [idx c]
-               (* (int (expt 16 idx)) (Integer/parseInt (str c) 16))) (reverse s)))
+    (edn/read-string (str "0x" s))
   (catch java.lang.NumberFormatException e nil)))
 
 (defn ceil

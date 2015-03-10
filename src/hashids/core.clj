@@ -19,9 +19,13 @@
   [opts & hexstrs]
   {:pre [(not-empty hexstrs)
          (every? string? (flatten (list hexstrs)))]}
-  (encode opts (map util/hexstr->long (flatten (list hexstrs)))))
+  (encode opts (mapcat
+                (fn [s]
+                  (map #(util/hexstr->long (str "1" %))
+                       (re-seq #"[\w\W]{1,12}" s)))
+                hexstrs)))
 
 (defn decode-hex
   [opts encstr]
   {:pre [(seq encstr)]}
-  (map util/long->hexstr (decode opts encstr)))
+  (map #(subs (util/long->hexstr %) 1) (decode opts encstr)))
