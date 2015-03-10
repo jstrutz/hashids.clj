@@ -1,4 +1,4 @@
-(defproject hashids "0.1.0"
+(defproject jstrutz/hashids "0.1.0"
   :description "Generate short unique ids from integers"
   :url "https://github.com/jstrutz/hashids.clj"
   :scm {:name "git"

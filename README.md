@@ -2,7 +2,14 @@
 
 A Clojure library to generate short unique ids from integers.
 
-This is port of the [hashids](http://hashids.org) library, and aims to be functionally identical.
+This is port of the [hashids](http://hashids.org) library, and aims to be functionally identical to other implementations, while remaing pure clojure, without a dependency on any other library.
+
+## Installation
+
+In your Leiningen `project.clj`'s `:dependencies`:
+```
+[jstrutz/hashids "0.1.0"]
+```
 
 ## Usage
 
