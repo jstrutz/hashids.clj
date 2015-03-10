@@ -37,7 +37,7 @@ I use **this is my salt** as an example.
 ;; Use a custom alphabet
 (h/encode {:alphabet "0123456789uvwxyz"} 12345) ;; => "v95w8x"
 
-;; Encode into hexidecimal
+;; Encode into hexadecimal
 (h/encode-hex hashids-opts "deadbeef") ;; => "kRNrpKlJ"
 ```
 
@@ -56,7 +56,7 @@ Notice during decoding, same salt value is used:
 ;; an empty collection also
 (h/decode {:alphabet "0123456789uvwxyz"} "PPPP") ;; => ()
 
-;; Decode from hexidecimal
+;; Decode from hexadecimal
 (h/decode-hex hashids-opts "kRNrpKlJ") ;; => ("deadbeef")
 ```
 
