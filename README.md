@@ -1,6 +1,6 @@
 # hashids.clj
 
-A Clojure library to generate short unique ids from integers.
+A Clojure library to generate short unique ids from integers, for bevity and obfuscation of database IDs.
 
 This is port of the [hashids](http://hashids.org) library, and aims to be functionally identical to other implementations, while remaing pure clojure, without a dependency on any other library.
 
