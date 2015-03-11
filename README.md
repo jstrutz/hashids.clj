@@ -109,5 +109,4 @@ Therefore, the algorithm tries to avoid generating most common English curse wor
 
 Copyright © 2015 [Jason Strutz](http://jasonstrutz.com)
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the MIT License
