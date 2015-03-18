@@ -4,7 +4,7 @@ A Clojure library to generate short unique ids from integers, for brevity and ob
 
 This is port of the [hashids](http://hashids.org) library, and aims to be functionally identical to other implementations, while remaing pure clojure, without a dependency on any other library.
 
-> **NOTE**   Hashids is not a [cryptographic hash](http://en.wikipedia.org/wiki/Cryptographic_hash_function), as it is reversible, and and is not suitable for security purposes.  Don't try to encode secrets with hashids.
+> **NOTE**   Hashids is not a [cryptographic hash](http://en.wikipedia.org/wiki/Cryptographic_hash_function), as it is reversible, and is not suitable for security purposes.  Don't try to encode secrets with hashids.
 
 ## Installation
 
@@ -150,7 +150,7 @@ Hashids provides the following functions:
 
 **Returns** a list of one or more decoded numbers, in the order in which they were encoded.  If the given string was unable to be decoded, an empty list `()` is returned.
 
-### `decode-hex` - Decodes a hashid into a collection of hexadecimal strings
+### `decode-hex` - Decodes a _hashid string_ into a collection of hexadecimal strings
 
 `(decode-hex opts hashstr)`
 
