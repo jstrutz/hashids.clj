@@ -1,5 +1,5 @@
 (ns hashids.util
-  (require [clojure.edn :as edn]))
+  (:require [clojure.edn :as edn]))
 
 (defmacro xor
   ([] nil)
