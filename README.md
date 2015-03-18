@@ -10,7 +10,7 @@ This is port of the [hashids](http://hashids.org) library, and aims to be functi
 
 In your Leiningen `project.clj`'s `:dependencies`:
 ```
-[jstrutz/hashids "1.0.0"]
+[jstrutz/hashids "1.0.1"]
 ```
 
 ## Usage
