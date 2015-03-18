@@ -1,14 +1,16 @@
 # hashids.clj
 
-A Clojure library to generate short unique ids from integers, for bevity and obfuscation of database IDs.
+A Clojure library to generate short unique ids from integers, for brevity and obfuscation of database IDs.
 
 This is port of the [hashids](http://hashids.org) library, and aims to be functionally identical to other implementations, while remaing pure clojure, without a dependency on any other library.
+
+> **NOTE**   Hashids is not a [cryptographic hash](http://en.wikipedia.org/wiki/Cryptographic_hash_function), as it is reversible, and and is not suitable for security purposes.  Don't try to encode secrets with hashids.
 
 ## Installation
 
 In your Leiningen `project.clj`'s `:dependencies`:
 ```
-[jstrutz/hashids "0.1.0"]
+[jstrutz/hashids "1.0.0"]
 ```
 
 ## Usage
@@ -104,6 +106,59 @@ Therefore, the algorithm tries to avoid generating most common English curse wor
 
 	c, C, s, S, f, F, h, H, u, U, i, I, t, T
 
+## API
+
+Hashids provides the following functions:
+
+### `encode` - Encodes one or more numbers into a _hashid string_
+
+`(encode opts & numbers)`
+
+> where `opts` is a map with the following keys, each optional:
+- `:salt` - a string to customize the encoding and decoding
+  - Must be a string, if specified
+  - Must be comprised of characters from the `:alphabet` option
+  - Default: `""`
+- `:min-length` - the minimum length of the returned string.
+	- Must be an integer >= 0, if supplied
+	- Default: `0`
+- `:alphabet` - a string containing the acceptable characters to return.
+  - Must be a string of at least 16 unique characters, if specified
+  - Default: `"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"`
+
+> `numbers` is one or more non-negative integers, or a collection (vector, list, etc.) of non-negative integers
+
+**Returns** a string representing the encoded numbers.
+
+### `encode-hex` - Encodes multiple hexadecimal numbers into a _hashid string_
+
+`(encode-hex opts & strings)`
+
+> `opts` is the same map as described in `encode`
+
+> `strings` is one or more hexadecimal numbers represented as strings, or a collection (vector, list, etc.) of hexadecimal numbers, again represented as strings
+
+**Returns** a string representing the encoded numbers.
+
+### `decode` - Decodes a _hashid string_ into a collection of numbers
+
+`(decode opts hashstr)`
+
+> `opts` is the same map as described as for `encode`, although the `:min-length` option will have no effect when decoding
+
+> `hashstr` is a single hashid string
+
+**Returns** a list of one or more decoded numbers, in the order in which they were encoded.  If the given string was unable to be decoded, an empty list `()` is returned.
+
+### `decode-hex` - Decodes a hashid into a collection of hexadecimal strings
+
+`(decode-hex opts hashstr)`
+
+> `opts` is the same map as described as for `encode`, although the `:min-length` option will have no effect when decoding
+
+> `hashstr` is a single hashid string
+
+**Returns** a list of one or more decoded numbers, in the order in which they were encoded, represented as hexadecimal strings.  If the given string was unable to be decoded, an empty list `()` is returned.
 
 ## License
 
