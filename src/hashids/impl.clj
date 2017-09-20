@@ -177,19 +177,21 @@
 (defn decode
   [opts encstr]
   {:pre [(string? encstr)]}
-  (let [{:keys [seps alphabet salt min-length guards]} (setup opts)
-        breakdown (split-on-chars encstr guards)
-        breakdown-idx (if (some #{(count breakdown)} '(2 3)) 1 0)
-        bdn (nth breakdown breakdown-idx)
-        lottery (first bdn)
-        arr (split-on-chars (drop 1 bdn) seps)
-        decoded-result (seq (second (reduce (fn [[prev-alph ret] sub-hash]
-                        (let [buf (str lottery salt prev-alph)
-                              alph (consistent-shuffle prev-alph (subs buf 0 (count prev-alph)))]
-                          [alph (conj ret (dehash sub-hash alph))]))
-                      [alphabet []]
-                      arr)))]
-    (if (= encstr
-           (encode opts decoded-result))
-      decoded-result
-      '())))
+  (if (< (count encstr) 2)
+    '()
+    (let [{:keys [seps alphabet salt min-length guards]} (setup opts)
+          breakdown (split-on-chars encstr guards)
+          breakdown-idx (if (some #{(count breakdown)} '(2 3)) 1 0)
+          bdn (nth breakdown breakdown-idx)
+          lottery (first bdn)
+          arr (split-on-chars (drop 1 bdn) seps)
+          decoded-result (seq (second (reduce (fn [[prev-alph ret] sub-hash]
+                          (let [buf (str lottery salt prev-alph)
+                                alph (consistent-shuffle prev-alph (subs buf 0 (count prev-alph)))]
+                            [alph (conj ret (dehash sub-hash alph))]))
+                        [alphabet []]
+                        arr)))]
+      (if (and (some? decoded-result) (= encstr
+             (encode opts decoded-result)))
+        decoded-result
+        '()))))

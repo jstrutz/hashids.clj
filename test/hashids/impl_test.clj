@@ -93,6 +93,15 @@
   (is (= '() (decode {:salt "xyzzy"} (encode {:salt "abcde"} [0 1 2]))))
   (is (= '() (decode {:salt "xyzzy"} (encode {:salt "z"} [9000])))))
 
+(deftest decode-returns-empty-collection-for-illegal-hashes
+  "ensure that decoding an unknown hash returns an empty collection"
+  (is (= '() (decode {:salt "xyzzy"} "a")))
+  (is (= '() (decode {:salt "xyzzy"} "b")))
+  (is (= '() (decode {:salt "xyzzy"} "f")))
+  (is (= '() (decode {:salt "xyzzy"} "m")))
+  (is (= '() (decode {:salt "xyzzy"} "af")))
+  (is (= '() (decode {:salt "xyzzy"} "bh"))))
+
 (deftest ensure-min-length-sanity-check
   (is (= "B0NkK9A5" ((ensure-min-length {:min-length 8
                                          :alphabet "4VNWO5kPrnZ1Y3LgKoBmXyzwb9aMj7l2RDQ6EJexqv8p"
