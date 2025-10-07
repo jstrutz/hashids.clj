@@ -160,6 +160,23 @@ Hashids provides the following functions:
 
 **Returns** a list of one or more decoded numbers, in the order in which they were encoded, represented as hexadecimal strings.  If the given string was unable to be decoded, an empty list `()` is returned.
 
+## Development
+
+    # Run Clojure Tests
+    clj -M:test:clj
+
+    # Run ClojureScript Tests
+    clj -M:test:cljs
+
+    # Run Babashka Tests
+    bb test
+
+    # Run ClojureCLR Tests
+    cljr -X:test:cljr
+
+    # Run ClojureDart Tests
+    clj -M:test:cljd test
+
 ## License
 
 Copyright © 2015 [Jason Strutz](http://jasonstrutz.com)

@@ -1,0 +1,15 @@
+{:paths     ["src"]
+ :cljd/opts {:kind :dart :main cljd.run-tests}
+ :deps      {org.clojure/clojure {:mvn/version "1.12.2"}}
+ :aliases   {:test {:extra-paths ["test"]
+                    :extra-deps  {org.clojure/clojurescript {:mvn/version "1.12.42"}
+                                  org.clojure/test.check    {:mvn/version "1.1.1"}}}
+             :clj  {:extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+                    :main-opts  ["-m" "cognitect.test-runner"]
+                    :exec-fn    cognitect.test-runner.api/test}
+             :cljs {:extra-deps {olical/cljs-test-runner {:mvn/version "3.8.1"}}
+                    :main-opts  ["-m" "cljs-test-runner.main"]}
+             :cljd {:extra-deps {tensegritics/clojuredart {:git/url "https://github.com/tensegritics/ClojureDart.git" :sha "2c070ca1ca7b7a2135808bd25f80035ec5619117"}}
+                    :main-opts  ["-m" "cljd.build"]}
+             }
+ }
